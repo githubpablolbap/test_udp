@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+func hello(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(w, "hello\n")
+}
+
 func main() {
 	// listen to incoming udp packets
 	udpServer, err := net.ListenPacket("udp", ":55555")
@@ -16,6 +20,9 @@ func main() {
 		log.Fatal(err)
 	}
 	defer udpServer.Close()
+
+	http.HandleFunc("/", hello)
+	go http.ListenAndServe(":55555", nil)
 
 	for {
 		buf := make([]byte, 1024)
