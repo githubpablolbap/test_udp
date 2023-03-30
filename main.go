@@ -1,5 +1,3 @@
-// the simplest example of a Fly.io app that listens on both UDP and TCP;
-// the envar ECHO_PORT configures the port (default 5000)
 package main
 
 import (
