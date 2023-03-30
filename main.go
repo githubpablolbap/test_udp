@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// listen to incoming udp packets
-	udpServer, err := net.ListenPacket("udp", ":1053")
+	udpServer, err := net.ListenPacket("udp", ":55555")
 	if err != nil {
 		log.Fatal(err)
 	}
