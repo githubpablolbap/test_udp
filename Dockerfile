@@ -6,7 +6,7 @@ COPY . /app
 RUN go mod download
 RUN go build -o main
 # EXPOSE 8080
-EXPOSE 55555/udp
-EXPOSE 55555/tcp
+EXPOSE 22222/udp
+EXPOSE 22222/tcp
 CMD ["/app/main"]
 
