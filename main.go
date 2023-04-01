@@ -13,26 +13,27 @@ func main() {
 	http.HandleFunc("/", HandleEntry)
 	fmt.Println("...server started...")
 	// http.ListenAndServe(":"+GoPort("22222"), nil)
-	http.ListenAndServe(":80", nil)
+	http.ListenAndServe(":22222", nil)
 }
 
 func HandleEntry(w http.ResponseWriter, r *http.Request) {
 	if r.URL.String() == "/ws/" {
-		fmt.Fprintf(w, "Hello, there .../ws/\n")
-		// upgrader := websocket.Upgrader{ReadBufferSize: 128, WriteBufferSize: 1024}
-		// conn, err := upgrader.Upgrade(w, r, nil)
-		// if err == nil {
-		// 	go HandleClient(conn)
-		// 	return
-		// } else {
-		// 	conn.Close()
-		// 	return
-		// }
+		// fmt.Fprintf(w, "Hello, there .../ws/\n")
+		upgrader := websocket.Upgrader{ReadBufferSize: 128, WriteBufferSize: 1024}
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err == nil {
+			go HandleClient(conn)
+			// return
+		} else {
+			conn.Close()
+			// return
+		}
 	} else {
 		fmt.Fprintf(w, "Hello, there .../\n")
-		return
+		// return
 	}
 }
+
 func GoPort(p string) string {
 	pt := os.Getenv("PORT")
 	if pt == "" {
@@ -43,21 +44,23 @@ func GoPort(p string) string {
 
 func HandleClient(conn *websocket.Conn) {
 	//
-	var msg []byte
+	// var msg []byte
 	var err error
+	// fmt.Println(msg[:1])
 	// var conn *websocket.Conn = client.conn
 	// var nick [20]byte = [20]byte{}
 	//
 	for {
-		_, msg, err = conn.ReadMessage()
+		// _, msg, err = conn.ReadMessage()
+		_, _, err = conn.ReadMessage()
 		if err == nil {
-			err = conn.WriteMessage(2, msg[:])
+			err = conn.WriteMessage(2, []byte{0, 0, 0, 0, 0})
 			if err != nil {
 				fmt.Println("error SendData():", err)
 			}
 		} else {
 			conn.Close()
-			return
+			break
 		}
 	}
 }
