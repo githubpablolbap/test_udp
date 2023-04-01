@@ -39,7 +39,7 @@ func ReadUdp() {
 
 func main() {
 	//
-	// go ReadUdp()
+	go ReadUdp()
 	//
 	http.HandleFunc("/", HelloHandler)
 	log.Println("Listening...")
