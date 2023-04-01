@@ -4,22 +4,26 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/websocket"
 )
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
 
 func main() {
 	http.HandleFunc("/", HandleEntry)
 	fmt.Println("...server started...")
 	// http.ListenAndServe(":"+GoPort("22222"), nil)
-	http.ListenAndServe(":22222", nil)
+	http.ListenAndServe(":8080", nil)
 }
 
 func HandleEntry(w http.ResponseWriter, r *http.Request) {
 	if r.URL.String() == "/ws/" {
 		// fmt.Fprintf(w, "Hello, there .../ws/\n")
-		upgrader := websocket.Upgrader{ReadBufferSize: 128, WriteBufferSize: 1024}
+		// upgrader := websocket.Upgrader{ReadBufferSize: 128, WriteBufferSize: 1024}
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err == nil {
 			go HandleClient(conn)
@@ -30,17 +34,20 @@ func HandleEntry(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		fmt.Fprintf(w, "Hello, there .../\n")
+		// fmt.Fprintf(w,"%s sent: %s\n", conn.RemoteAddr(), string(msg))
+
+		// fmt.Printf("%s sent: %s\n", conn.RemoteAddr(), string(msg))
 		// return
 	}
 }
 
-func GoPort(p string) string {
-	pt := os.Getenv("PORT")
-	if pt == "" {
-		pt = p
-	}
-	return pt
-}
+// func GoPort(p string) string {
+// 	pt := os.Getenv("PORT")
+// 	if pt == "" {
+// 		pt = p
+// 	}
+// 	return pt
+// }
 
 func HandleClient(conn *websocket.Conn) {
 	//
