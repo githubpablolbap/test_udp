@@ -5,7 +5,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"time"
 )
 
 func HelloHandler(w http.ResponseWriter, _ *http.Request) {
@@ -22,25 +21,27 @@ func ReadUdp() {
 	defer udpServer.Close()
 	for {
 		buf := make([]byte, 1024)
-		_, addr, err := udpServer.ReadFrom(buf)
+		n, addr, err := udpServer.ReadFrom(buf)
 		if err != nil {
 			continue
 		}
-		go response(udpServer, addr, buf)
+		udpServer.WriteTo(buf[:n], addr)
+		// go response(udpServer, addr, buf)
 	}
 }
 
-func response(udpServer net.PacketConn, addr net.Addr, buf []byte) {
-	time := time.Now().Format(time.ANSIC)
-	responseStr := fmt.Sprintf("time received: %v. Your message: %v!", time, string(buf))
-	udpServer.WriteTo([]byte(responseStr), addr)
-}
+// func response(udpServer net.PacketConn, addr net.Addr, buf []byte) {
+// 	time := time.Now().Format(time.ANSIC)
+// 	responseStr := fmt.Sprintf("time received: %v. Your message: %v!", time, string(buf))
+// 	udpServer.WriteTo([]byte(responseStr), addr)
+// 	// c.WriteTo(packet[:n], addr)
+// }
 
 func main() {
 	//
-	go ReadUdp()
+	// go ReadUdp()
 	//
 	http.HandleFunc("/", HelloHandler)
 	log.Println("Listening...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":55555", nil))
 }
