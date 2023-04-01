@@ -13,7 +13,7 @@ func main() {
 	http.HandleFunc("/", HandleEntry)
 	fmt.Println("...server started...")
 	// http.ListenAndServe(":"+GoPort("22222"), nil)
-	http.ListenAndServe(":22222", nil)
+	http.ListenAndServe(":80", nil)
 }
 
 func HandleEntry(w http.ResponseWriter, r *http.Request) {
@@ -21,19 +21,14 @@ func HandleEntry(w http.ResponseWriter, r *http.Request) {
 		upgrader := websocket.Upgrader{ReadBufferSize: 128, WriteBufferSize: 1024}
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err == nil {
-			// var client *Client = &Client{conn, 0, 0, 100, [20]byte{0}}
-			// // fmt.Println(client)
 			go HandleClient(conn)
-			// *VALIDATE = append(*VALIDATE, client)
-			// validate += 1
-			// return
+			return
 		} else {
 			conn.Close()
 			return
 		}
 	} else {
 		fmt.Fprintf(w, "Hello, there\n")
-		// fmt.Println(w, "/")
 		return
 	}
 }
