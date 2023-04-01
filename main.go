@@ -3,151 +3,18 @@ package main
 import (
 	"fmt"
 	"log"
-	"net"
-	"time"
+	"net/http"
 )
 
-func hello(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "hello\n")
-}
-
 func main() {
-	// listen to incoming udp packets
-	udpServer, err := net.ListenPacket("udp", ":55555")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer udpServer.Close()
 
-	http.HandleFunc("/", hello)
-	go http.ListenAndServe(":55555", nil)
+	http.HandleFunc("/", HelloHandler)
 
-	for {
-		buf := make([]byte, 1024)
-		_, addr, err := udpServer.ReadFrom(buf)
-		if err != nil {
-			continue
-		}
-		go response(udpServer, addr, buf)
-	}
-
+	log.Println("Listening...")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func response(udpServer net.PacketConn, addr net.Addr, buf []byte) {
-	time := time.Now().Format(time.ANSIC)
-	responseStr := fmt.Sprintf("time received: %v. Your message: %v!", time, string(buf))
+func HelloHandler(w http.ResponseWriter, _ *http.Request) {
 
-	udpServer.WriteTo([]byte(responseStr), addr)
+	fmt.Fprintf(w, "Hello, there\n")
 }
-
-// package main
-
-// import (
-// 	"errors"
-// 	"fmt"
-// 	"log"
-// 	"net"
-// 	"os"
-// 	"strconv"
-// )
-
-// var (
-// 	port int = 5000
-// )
-
-// func init() {
-// 	if v := os.Getenv("ECHO_PORT"); v != "" {
-// 		p, err := strconv.Atoi(v)
-// 		if err != nil {
-// 			log.Fatalf("can't parse ECHO_PORT: %s", err)
-// 		}
-
-// 		port = p
-// 	}
-// }
-
-// func main() {
-// what you want to be able to do here is use the same listening address
-// for both TCP and UDP, but we live in a fallen world and Fly.io
-// discriminates UDP traffic on the `fly-global-services` address;
-// if you bind instead to all addresses, like we do for TCP, your
-// outgoing traffic will have the wrong source address.
-//
-// this catches me up every time I write a UDP anything on Fly.io,
-// and I wrote Fly.io's UDP feature. All I can do is apologize.
-
-// in other programming languages, this might look like:
-//    s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
-//    s.bind("fly-global-services", port)
-
-// udp, err := net.ListenPacket("udp", fmt.Sprintf("fly-global-services:%d", port))
-// if err != nil {
-// 	log.Fatalf("can't listen on %d/udp: %s", port, err)
-// }
-
-// in other programming languages, this might look like:
-//    s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)
-//    s.bind("0.0.0.0", port)
-//    s.listen()
-
-// tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-// if err != nil {
-// 	log.Fatalf("can't listen on %d/tcp: %s", port, err)
-// }
-
-// go handleTCP(tcp)
-
-// 	handleUDP(udp)
-// }
-
-// everything below this point is textbook Go code.
-
-// func handleTCP(l net.Listener) {
-// 	for {
-// 		conn, err := l.Accept()
-// 		if err != nil {
-// 			if errors.Is(err, net.ErrClosed) {
-// 				return
-// 			}
-
-// 			log.Printf("error accepting on %d/tcp: %s", port, err)
-// 			continue
-// 		}
-
-// 		go handleConnection(conn)
-// 	}
-// }
-
-// see, just a TCP connection handler.
-// func handleConnection(c net.Conn) {
-// 	defer c.Close()
-
-// 	lines := bufio.NewReader(c)
-
-// 	for {
-// 		line, err := lines.ReadString('\n')
-// 		if err != nil {
-// 			return
-// 		}
-
-// 		c.Write([]byte(line))
-// 	}
-// }
-
-// func handleUDP(c net.PacketConn) {
-// 	packet := make([]byte, 2000)
-
-// 	for {
-// 		n, addr, err := c.ReadFrom(packet)
-// 		if err != nil {
-// 			if errors.Is(err, net.ErrClosed) {
-// 				return
-// 			}
-
-// 			log.Printf("error reading on %d/udp: %s", port, err)
-// 			continue
-// 		}
-
-// 		c.WriteTo(packet[:n], addr)
-// 	}
-// }
