@@ -18,17 +18,18 @@ func main() {
 
 func HandleEntry(w http.ResponseWriter, r *http.Request) {
 	if r.URL.String() == "/ws/" {
-		upgrader := websocket.Upgrader{ReadBufferSize: 128, WriteBufferSize: 1024}
-		conn, err := upgrader.Upgrade(w, r, nil)
-		if err == nil {
-			go HandleClient(conn)
-			return
-		} else {
-			conn.Close()
-			return
-		}
+		fmt.Fprintf(w, "Hello, there .../ws/\n")
+		// upgrader := websocket.Upgrader{ReadBufferSize: 128, WriteBufferSize: 1024}
+		// conn, err := upgrader.Upgrade(w, r, nil)
+		// if err == nil {
+		// 	go HandleClient(conn)
+		// 	return
+		// } else {
+		// 	conn.Close()
+		// 	return
+		// }
 	} else {
-		fmt.Fprintf(w, "Hello, there\n")
+		fmt.Fprintf(w, "Hello, there .../\n")
 		return
 	}
 }
